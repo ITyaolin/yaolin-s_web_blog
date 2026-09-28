@@ -1,0 +1,8 @@
+# 参考素材：hexo 主题克隆目录（自带嵌套 .git，不属于站点内容）
+hexo/
+
+# 系统与编辑器临时文件
+.DS_Store
+Thumbs.db
+*.swp
+*~
