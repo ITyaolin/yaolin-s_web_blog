@@ -133,6 +133,7 @@ section[id], .post-article { scroll-margin-top: 96px; }
   align-items: center;
   gap: 9px;
   white-space: nowrap;
+  flex: 0 0 auto; /* 品牌区不被压缩，也就不会把右侧开关挤出去 */
   transition: opacity 0.2s;
 }
 .site-logo .logo-text {
@@ -159,7 +160,8 @@ section[id], .post-article { scroll-margin-top: 96px; }
 .ds-header-bar.is-scrolled .logo-text { font-size: 1.18rem; }
 .ds-header-bar.is-scrolled .logo-avatar { width: 28px; height: 28px; }
 
-.site-nav { display: flex; align-items: center; gap: 4px; }
+/* min-width:0 让导航链接吸收压缩，避免整条药丸被内容撑破 */
+.site-nav { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .site-nav a {
   padding: 7px 14px;
   border-radius: 999px;
@@ -177,7 +179,7 @@ section[id], .post-article { scroll-margin-top: 96px; }
 }
 .ds-header-bar.is-scrolled .site-nav a { padding: 5px 12px; font-size: 0.9rem; }
 
-.nav-actions { display: flex; align-items: center; gap: 8px; }
+.nav-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
 .nav-github {
   width: 38px;
   height: 38px;
@@ -714,9 +716,6 @@ body::after {
 }
 
 @media (max-width: 560px) {
-  .ds-header-bar { gap: 8px; padding-left: 10px; padding-right: 10px; }
-  .site-nav a { padding: 6px 11px; font-size: 0.88rem; }
-  .nav-github { display: none; }
   .music-title { max-width: 90px; }
 }
 
@@ -891,21 +890,6 @@ body::after {
   white-space: nowrap;
 }
 .music-dock.muted .music-eq i { opacity: 0.15; }
-.music-icon {
-  font-size: 0.95rem;
-  line-height: 1;
-}
-.music-hint {
-  font-size: 0.72rem;
-  color: var(--muted);
-  white-space: nowrap;
-  animation: hintPulse 1.6s ease-in-out infinite;
-}
-.music-dock.playing .music-hint { display: none; }
-@keyframes hintPulse {
-  0%, 100% { opacity: 0.55; }
-  50% { opacity: 1; }
-}
 
 /* ---------- 歌词按钮 ---------- */
 .music-lyric-btn {
@@ -1352,12 +1336,8 @@ main {
 [data-theme="dark"] .theme-toggle .ico-sun { display: block; }
 .nav-github svg { width: 17px; height: 17px; }
 
-.music-icon { display: inline-flex; align-items: center; }
-.music-icon svg { width: 12px; height: 12px; }
 .music-play svg { width: 13px; height: 13px; }
 .music-next svg, .music-lyric-btn svg { width: 12px; height: 12px; }
-.music-hint { display: inline-flex; align-items: center; gap: 3px; }
-.music-hint svg { width: 11px; height: 11px; }
 .music-dock .m-ico-pause { display: none; }
 .music-dock.playing .m-ico-play { display: none; }
 .music-dock.playing .m-ico-pause { display: block; }
@@ -1658,15 +1638,32 @@ main {
   font-weight: 600;
 }
 
-/* 导航在 4 个链接下的响应式 */
+/* ---------- 导航响应式：窄屏也要把主题开关留在药丸里 ---------- */
 @media (max-width: 900px) {
   .site-nav a { padding: 7px 11px; }
   .ds-header-bar.is-scrolled .site-nav a { padding: 5px 9px; }
   .logo-avatar { width: 30px; height: 30px; }
 }
-@media (max-width: 560px) {
-  .site-nav a { padding: 5px 8px; font-size: 0.86rem; }
+@media (max-width: 620px) {
+  /* 药丸两侧留白收窄，把宽度让给内容 */
+  .ds-header-wrapper { width: min(100% - 20px, 1140px); padding-top: 10px; }
+  .ds-header-bar { gap: 6px; padding-left: 10px; padding-right: 10px; }
+  .ds-header-bar.is-scrolled { padding-left: 10px; padding-right: 10px; }
+  .site-nav { gap: 2px; }
+  .site-nav a { padding: 5px 8px; font-size: 0.85rem; }
+  .ds-header-bar.is-scrolled .site-nav a { padding: 4px 7px; font-size: 0.82rem; }
+  .nav-actions { gap: 6px; }
+  .nav-github { display: none; } /* 手机上先省掉 GitHub 按钮，给开关让位 */
+  .theme-toggle { width: 34px; height: 34px; }
+  .ds-header-bar.is-scrolled .theme-toggle { width: 30px; height: 30px; }
+  .logo-text { font-size: 1.1rem; }
   .logo-avatar { width: 26px; height: 26px; }
   .ds-header-bar.is-scrolled .logo-avatar { width: 24px; height: 24px; }
-  .logo-text { font-size: 1.12rem; }
+}
+@media (max-width: 420px) {
+  /* 极窄屏：只留头像做标识，保证 4 个导航 + 主题开关都待在药丸内 */
+  .site-logo .logo-text { display: none; }
+  .site-nav { overflow-x: auto; padding: 2px 0; scrollbar-width: none; -ms-overflow-style: none; }
+  .site-nav::-webkit-scrollbar { display: none; }
+  .site-nav a { padding: 4px 7px; font-size: 0.82rem; }
 }

@@ -9,7 +9,6 @@ banner-okayu.jpg    <- m9523m  猫又小粥（Nekomata Okayu）
 banner-blue.jpg     <- dpjylo  蓝发猫娘
 banner-dark.jpg     <- y8d6q7  黑背景猫娘（适合深色模式）
 banner-pink.jpg     <- x8zm3z  粉发猫耳
-banner-catpink.jpg  <- mdypk1  粉色系猫娘
 banner-white.jpg    <- ym9d6x  白发猫耳娘
 banner-wide.jpg     <- l8kg8l  Hololive 雪花菈米（超宽图）
 banner-dress.jpg    <- rr3ryw  旗袍猫娘

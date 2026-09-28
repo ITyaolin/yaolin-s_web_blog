@@ -219,7 +219,6 @@ var COVERS = [
   "img/banner-blue.jpg",
   "img/banner-dark.jpg",
   "img/banner-pink.jpg",
-  "img/banner-catpink.jpg",
   "img/banner-white.jpg",
   "img/banner-wide.jpg",
   "img/banner-dress.jpg",
