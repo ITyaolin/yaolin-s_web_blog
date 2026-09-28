@@ -57,7 +57,7 @@
     "summary": "更新预告 起因 前几天在咸鱼上看到了一块rk3399的开发板，所以买了下来准备干些事 1，搭建一个我的世界服务器 2，把它当作一个 nas来用 3，搭建一个原神服务器（有时间的话） 上面这3个…",
     "url": "posts/p-%E6%9B%B4%E6%96%B0%E9%A2%84%E5%91%8A.html",
     "minutes": 1,
-    "content": "# 更新预告\n\n起因\n\n前几天在咸鱼上看到了一块rk3399的开发板，所以买了下来准备干些事\n\n1，搭建一个我的世界服务器\n\n2，把它当作一个 nas来用\n\n3，搭建一个原神服务器（有时间的话）\n\n上面这3个项目每一个应该都会出一期教程\n\n2023 8 11"
+    "content": "# 更新预告\n\n起因\n\n前几天在咸鱼上看到了一块rk3399的开发板，所以买了下来准备干些事\n\n1，搭建一个我的世界服务器\n\n2，把它当作一个 nas来用\n\n3，搭建一个原神服务器（有时间的话）\n\n上面这3个项目每一个应该都会出一期教程\n\n2023 8 11\n\n> 本文作于 2023 年 8 月 11 日，2026 年从旧博客（Hexo）迁回本站。"
   },
   {
     "id": "hello-world",
@@ -67,16 +67,16 @@
     "summary": "Hello World Welcome to Hexo! This is your very first post. Check documentation for more info. If…",
     "url": "posts/p-hello-world.html",
     "minutes": 1,
-    "content": "# Hello World\n\nWelcome to [Hexo](https://hexo.io/)! This is your very first post. Check [documentation](https://hexo.io/docs/) for more info. If you get any problems when using Hexo, you can find the answer in [troubleshooting](https://hexo.io/docs/troubleshooting.html) or you can ask me on [GitHub](https://github.com/hexojs/hexo/issues).\n\n## Quick Start\n\n### Create a new post\n\n``` bash\n$ hexo new \"My New Post\"\n```\n\nMore info: [Writing](https://hexo.io/docs/writing.html)\n\n### Run server\n\n``` bash\n$ hexo server\n```\n\nMore info: [Server](https://hexo.io/docs/server.html)\n\n### Generate static files\n\n``` bash\n$ hexo generate\n```\n\nMore info: [Generating](https://hexo.io/docs/generating.html)\n\n### Deploy to remote sites\n\n``` bash\n$ hexo deploy\n```\n\nMore info: [Deployment](https://hexo.io/docs/one-command-deployment.html)"
+    "content": "# Hello World\n\nWelcome to [Hexo](https://hexo.io/)! This is your very first post. Check [documentation](https://hexo.io/docs/) for more info. If you get any problems when using Hexo, you can find the answer in [troubleshooting](https://hexo.io/docs/troubleshooting.html) or you can ask me on [GitHub](https://github.com/hexojs/hexo/issues).\n\n## Quick Start\n\n### Create a new post\n\n``` bash\n$ hexo new \"My New Post\"\n```\n\nMore info: [Writing](https://hexo.io/docs/writing.html)\n\n### Run server\n\n``` bash\n$ hexo server\n```\n\nMore info: [Server](https://hexo.io/docs/server.html)\n\n### Generate static files\n\n``` bash\n$ hexo generate\n```\n\nMore info: [Generating](https://hexo.io/docs/generating.html)\n\n### Deploy to remote sites\n\n``` bash\n$ hexo deploy\n```\n\nMore info: [Deployment](https://hexo.io/docs/one-command-deployment.html)\n\n> 本文是 Hexo 初始化自带的示例文章，2026 年随旧博客一起迁回本站。"
   },
   {
     "id": "日常吐槽",
     "title": "淦，为什么背景老是显示不出来",
     "date": "2023-07-30",
     "tags": [],
-    "summary": "淦，为什么背景老是显示不出来 换了几个主题最后还是换回butterfly了（btterfly真香） git为什么老是出毛病，一会能用过一会就寄了",
+    "summary": "淦，为什么背景老是显示不出来 换了几个主题最后还是换回butterfly了（btterfly真香） git为什么老是出毛病，一会能用过一会就寄了 本文作于 2023 年 7 月 30 日，20…",
     "url": "posts/p-%E6%97%A5%E5%B8%B8%E5%90%90%E6%A7%BD.html",
     "minutes": 1,
-    "content": "# 淦，为什么背景老是显示不出来\n\n换了几个主题最后还是换回butterfly了（btterfly真香）\n\ngit为什么老是出毛病，一会能用过一会就寄了"
+    "content": "# 淦，为什么背景老是显示不出来\n\n换了几个主题最后还是换回butterfly了（btterfly真香）\n\ngit为什么老是出毛病，一会能用过一会就寄了\n\n> 本文作于 2023 年 7 月 30 日，2026 年从旧博客（Hexo）迁回本站。"
   }
 ]

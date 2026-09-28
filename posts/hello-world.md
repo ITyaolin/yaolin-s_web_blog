@@ -40,3 +40,5 @@ $ hexo deploy
 ```
 
 More info: [Deployment](https://hexo.io/docs/one-command-deployment.html)
+
+> 本文是 Hexo 初始化自带的示例文章，2026 年随旧博客一起迁回本站。
