@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <base href="../">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>给静态博客写个 C 渲染器 · yaolin 博客</title>
+  <meta name="description" content="一个零依赖的 C 程序：把 posts/ 里的 Markdown 渲染成网页和清单，渲染规则和浏览器里那套 JS 完全一致，写完文章 make render 再推送。">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- 由 tools/render.c 生成，请勿手改；改文章请改 posts/ 里的源文件 -->
+</head>
+<body data-page="static">
+<header class="ds-header-wrapper">
+    <div class="ds-header-bar" id="ds-navbar">
+      <a class="site-logo" href="index.html">
+        <img class="logo-avatar" src="img/neko.jpg" alt="yaolin">
+        <span class="logo-text">yaolin<span>.</span></span>
+      </a>
+      <nav class="site-nav">
+        <a href="index.html">首页</a>
+        <a href="home.html">家</a>
+        <a href="friends.html">友链</a>
+        <a href="about.html">关于</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="nav-github" href="https://github.com/ITyaolin" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+        <button id="theme-toggle" class="theme-toggle" type="button" title="切换主题" aria-label="切换主题"><svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg><svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container post-layout">
+    <article id="post-article" class="post-article"><div class="post-cover"><img src="img/wallhaven-9mjoy1.png" alt="给静态博客写个 C 渲染器"></div><header class="post-head"><h1>给静态博客写个 C 渲染器</h1><div class="post-meta"><time datetime="2026-09-28">2026年9月28日</time><span class="dot">·</span><span>3 分钟读完</span></div><div class="card-tags"><span class="chip">C</span><span class="chip">静态博客</span><span class="chip">工具</span></div></header><div class="post-content"><h1>给静态博客写个 C 渲染器</h1><p>这个博客没有后台、没有数据库、也没有构建工具，文章就是 <code>posts/</code> 里的 <code>.md</code> 文件。本地写、本地看，一切都很舒服——直到我把它推到静态托管上。</p><h2 id="sec-0">问题是这样的</h2><p>站点本来是这样列文章的：首页去请求 <code>posts/</code> 这个目录，读服务器返回的目录列表，把里面的 <code>.md</code> / <code>.txt</code> 挑出来。本地 <code>python3 -m http.server</code> 能看到目录列表，所以写完刷新就出现；但 GitHub Pages 不会给你列目录，请求回来是一个 404。</p><p>结果就是：文章还在，首页空了。</p><h2 id="sec-1">两条路，都走通</h2><p>我没有推翻原来的设计，而是补了两层：</p><ul><li>渲染一份清单 <code>posts.json</code>，首页拿不到目录列表时就用它列文章</li><li>把每篇文章预先渲染成静态网页 <code>posts/p-&lt;id&gt;.html</code>，推送时一起带走</li></ul><p>这样本地服务器照旧实时读文件夹（写完刷新就见效），静态托管则走预渲染页，两条路各自都能用、互不干扰。</p><h2 id="sec-2">最关键的一条：规则要完全一样</h2><p>同一篇文章，浏览器里 <code>post.html?id=xxx</code> 渲染一遍、C 程序再渲染一遍，只要两边规则有一点点不一样，就会出现「本地看是对的，推上去歪了」。所以 <code>tools/render.c</code> 并不是重新实现一套 Markdown，而是把前端那套逐条照搬过来：</p><ul><li>front matter 的解析：<code>title</code> / <code>date</code> / <code>tags</code> / <code>summary</code>，<code>tags</code> 还支持 <code>[a, b]</code> 写法</li><li>Markdown 子集的渲染顺序：行内代码占位 → 加粗 → 斜体 → 删除线 → 图片 → 链接 → 还原占位</li><li>没有 <code>summary</code> 时的自动摘要：96 个 UTF-16 单元，超出部分补省略号</li><li>阅读时长：中文 400 字/分、英文 180 词/分，至少 1 分钟</li><li>封面：对文章 id 做一次 hash，再从壁纸池里取一张</li></ul><p>最后一条我特意没把壁纸列表抄进 C 里，而是启动时去读 <code>js/store.js</code> 里那个数组。抄一份下来，迟早会忘了同步。</p><h2 id="sec-3">页面放在 posts/ 里，靠一行 base 救回来</h2><p>文章页和文章源文件放在同一个目录（<code>posts/</code>），推送后一眼就能对上。代价是页面深了一层，页面里那些 <code>css/…</code>、<code>js/…</code>、<code>img/…</code>、<code>l2d/…</code>、<code>music/…</code> 的相对路径全都会找错地方。</p><p>我没有把它们逐个改写成 <code>../</code>，而是在 <code>&lt;head&gt;</code> 里加了一行：</p><pre><code class="lang-html">&lt;base href=&quot;../&quot;&gt;</code></pre><p>所有相对路径就都锚回站点根目录了，生成页和 <code>post.html</code> 用的是同一套引用。副作用有一个：<code>&lt;base&gt;</code> 会连纯 <code>#fragment</code> 一起改掉，页内跳转的 <code>#sec-1</code> 会跑到站点根去，所以目录里的锚点必须写成完整路径 <code>posts/p-&lt;id&gt;.html#sec-1</code>。</p><h2 id="sec-4">幂等，所以敢挂在推送前</h2><p>渲染器只在内容真的变了才写文件，没变的页一动不动。于是有了三个开关：</p><pre><code class="lang-sh">make            # 编译渲染器（只需要一次）
+make render     # 渲染：posts/p-&lt;id&gt;.html + posts.json
+make check      # 只检查有没有忘记渲染，过期就退出码 1
+make prune      # 删掉源文章已不存在的旧静态页</code></pre><p><code>make check</code> 是我最喜欢的一个：退出码非 0，就能直接串进推送流程，「忘记渲染」这件事从此不会发生。</p><pre><code class="lang-sh">vim posts/新文章.md
+make render &amp;&amp; make check
+git add -A &amp;&amp; git commit -m &quot;新文章&quot; &amp;&amp; git push</code></pre><h2 id="sec-5">顺手清掉的历史包袱</h2><p>文章页最早生成在站点根目录（和 <code>index.html</code> 同级），因为那时候只有同层才能让相对路径正常工作。现在有了 <code>&lt;base&gt;</code>，<code>make render</code> 会把根目录里那些旧位置的页面自己删掉，清理逻辑只认带生成标记的 <code>p-*.html</code>，不会误伤手写的页面。</p><h2 id="sec-6">一点体会</h2><p>写这个小工具，最大的收获其实不是 C，而是「对齐」：把浏览器里那套逻辑当作唯一正确的标准，C 只做它的等价实现，两边输出逐字节对比通过才算完。规则一致了，渲染这件事才真的能无脑压进一条命令里。</p></div></article>
+    <aside id="post-toc" class="post-toc"><h4 class="toc-title">目录</h4><ul class="toc-list"><li class="toc-h2"><a href="posts/p-%E7%BB%99%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E5%86%99%E4%B8%AAC%E6%B8%B2%E6%9F%93%E5%99%A8.html#sec-0">问题是这样的</a></li><li class="toc-h2"><a href="posts/p-%E7%BB%99%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E5%86%99%E4%B8%AAC%E6%B8%B2%E6%9F%93%E5%99%A8.html#sec-1">两条路，都走通</a></li><li class="toc-h2"><a href="posts/p-%E7%BB%99%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E5%86%99%E4%B8%AAC%E6%B8%B2%E6%9F%93%E5%99%A8.html#sec-2">最关键的一条：规则要完全一样</a></li><li class="toc-h2"><a href="posts/p-%E7%BB%99%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E5%86%99%E4%B8%AAC%E6%B8%B2%E6%9F%93%E5%99%A8.html#sec-3">页面放在 posts/ 里，靠一行 base 救回来</a></li><li class="toc-h2"><a href="posts/p-%E7%BB%99%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E5%86%99%E4%B8%AAC%E6%B8%B2%E6%9F%93%E5%99%A8.html#sec-4">幂等，所以敢挂在推送前</a></li><li class="toc-h2"><a href="posts/p-%E7%BB%99%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E5%86%99%E4%B8%AAC%E6%B8%B2%E6%9F%93%E5%99%A8.html#sec-5">顺手清掉的历史包袱</a></li><li class="toc-h2"><a href="posts/p-%E7%BB%99%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E5%86%99%E4%B8%AAC%E6%B8%B2%E6%9F%93%E5%99%A8.html#sec-6">一点体会</a></li></ul></aside>
+  </main>
+
+  <nav class="container post-nav">
+    <a id="prev-post" class="post-nav-link prev" href="posts/p-2026.09.18%E6%97%A5%E5%BF%97.html"><span class="nav-label">上一篇</span>2026-09-18吐槽</a>
+    <a href="index.html" class="back-home">← 返回首页</a>
+    <a id="next-post" class="post-nav-link next" href="posts/p-%E7%BB%88%E7%AB%AFASCII%E9%9F%B3%E4%B9%90%E5%8A%A8%E7%94%BB.html"><span class="nav-label">下一篇</span>把一首歌编译成终端动画：world.execute (me); ASCII MV</a>
+  </nav>
+
+<footer class="site-footer">
+    <div class="container">
+      <p>用 <svg class="foot-heart" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> 与代码一点点搭起来的小窝 · 文章来自本机 posts/ · 鲸鱼娘 + Lofi · <a class="footer-link" href="https://github.com/ITyaolin" target="_blank" rel="noopener">GitHub @ITyaolin</a></p>
+    </div>
+  </footer>
+
+<!-- 看板娘（右侧） -->
+  <div id="kanban-right" class="kanban kanban-right" title="鲸鱼娘">
+    <div class="kanban-bubble" id="kanban-right-bubble" hidden></div>
+  </div>
+
+  <!-- 背景音乐 -->
+  <div id="music-dock" class="music-dock" title="背景音乐（点击可暂停）">
+    <span id="music-eq" class="music-eq" aria-hidden="true"><i></i><i></i><i></i></span>
+    <button type="button" id="music-play" class="music-play" aria-label="播放或暂停">
+      <svg class="m-ico-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+      <svg class="m-ico-pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+    </button>
+    <span id="music-title" class="music-title">A Rusty Dream · DOUDOU</span>
+    <button type="button" id="music-next" class="music-next" aria-label="下一首"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></svg></button>
+    <button type="button" id="music-lyric-btn" class="music-lyric-btn" aria-label="歌词" title="歌词"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></button>
+  </div>
+
+  <!-- 播放进度条 -->
+  <div id="music-progress" class="music-progress" aria-hidden="true"><i id="music-progress-bar"></i></div>
+
+  <!-- 歌词面板 -->
+  <div id="music-lyrics" class="music-lyrics" hidden aria-label="歌词显示">
+    <div class="music-lyrics-head">♪ <span id="lyric-title">A Rusty Dream</span> · 同步歌词</div>
+    <div class="music-lyrics-body" id="lyric-body"></div>
+  </div>
+
+  
+
+  <script src="js/store.js"></script>
+  <script src="js/kanban.js" defer></script>
+  <script src="js/music.js" defer></script>
+  <script src="js/effects.js" defer></script>
+</body>
+</html>
