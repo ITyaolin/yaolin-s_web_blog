@@ -8,7 +8,7 @@
 
 (function () {
   var DEF = {
-    created: new Date("2025-07-08T00:00:00").getTime(),
+    created: new Date("2023-07-30T15:06:26").getTime(),
     spring: new Date("2026-02-17T00:00:00").getTime(),
     friends: []
   };
@@ -27,7 +27,9 @@
       var val = line.slice(eq + 1).trim();
       if (!val) continue;
       if (key === "created" || key === "spring") {
-        var t = Date.parse(val.replace(/-/g, "/").replace(" ", "T"));
+        /* 统一成 "YYYY/MM/DD HH:mm:ss"：这种写法各浏览器都认；
+           注意别把空格换成 T，那样会拼出 "YYYY/MM/DDTHH:mm:ss" 这种谁都解析不了的格式 */
+        var t = Date.parse(val.replace(/-/g, "/"));
         if (!isNaN(t)) cfg[key] = t;
       } else if (key === "friend") {
         var parts = val.split("|");
