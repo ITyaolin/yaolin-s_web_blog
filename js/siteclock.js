@@ -50,6 +50,14 @@
     SP_H.textContent = two(Math.floor(sp / 3600000) % 24);
     SP_M.textContent = two(Math.floor(sp / 60000) % 60);
     SP_S.textContent = two(Math.floor(sp / 1000) % 60);
+
+    /* 「自 YYYY-MM-DD 建站起…」那句里的日期也跟 config 走：
+       以后改 posts/config.txt 的 created，这句文案不用再手改 */
+    var since = document.getElementById("live-since");
+    if (since) {
+      var d0 = new Date(window.SITE_CONFIG.created);
+      since.textContent = d0.getFullYear() + "-" + two(d0.getMonth() + 1) + "-" + two(d0.getDate());
+    }
   }
 
   function renderFriends() {
