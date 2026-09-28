@@ -17,3 +17,7 @@ test.tar.gz
 .tmp_analysis/
 posts/*.back
 posts/*.bcak
+
+# 渲染器的编译产物（源码 tools/render.c 已入库；生成的 p-<id>.html 与 posts.json 要入库）
+tools/render
+tools/*.o

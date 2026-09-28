@@ -175,7 +175,27 @@ async function detectFolderPosts() {
     }
   }
 
+  /* 通道 3：预渲染清单。静态托管（GitHub Pages 等）没有目录列表，
+     用 tools/render.c 生成的 posts.json 兜底，文章页也换成预渲染的静态页 */
+  if (!out.length) {
+    var manifest = await detectManifestPosts();
+    for (var k = 0; k < manifest.length; k++) out.push(manifest[k]);
+  }
+
   return out;
+}
+
+/* 读取 tools/render.c 生成的 posts.json（id/title/date/tags/summary/url/content） */
+async function detectManifestPosts() {
+  try {
+    var res = await fetch("posts.json", { cache: "no-store" });
+    if (!res.ok) return [];
+    var arr = await res.json();
+    if (!Array.isArray(arr)) return [];
+    return arr.filter(function (m) { return m && m.id && m.content; });
+  } catch (e) {
+    return [];
+  }
 }
 
 /* 全量文章：内置 + 文件夹 + 本机发布，按日期倒序 */

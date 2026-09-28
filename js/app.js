@@ -1,5 +1,11 @@
 "use strict";
 
+/* 文章链接：有预渲染静态页（tools/render.c 生成的 posts.json 里带 url）就直接链过去，
+   否则回到客户端渲染的详情页 */
+function postHref(p) {
+  return p && p.url ? p.url : "post.html?id=" + encodeURIComponent(p.id);
+}
+
 /* ================= 首页：数据卡 + 轮播 + 列表/搜索/标签 ================= */
 
 function renderStats(posts) {
@@ -30,7 +36,7 @@ function renderCarousel(posts) {
         return (
           '<div class="carousel-slide' + (i === 0 ? " active" : "") + '">' +
           '<img src="' + coverFor(p) + '" alt="' + escapeHtml(p.title) + '">' +
-          '<div class="carousel-cap"><h3><a href="post.html?id=' + encodeURIComponent(p.id) + '">' + escapeHtml(p.title) + "</a></h3>" +
+          '<div class="carousel-cap"><h3><a href="' + postHref(p) + '">' + escapeHtml(p.title) + "</a></h3>" +
           "<p>" + escapeHtml(p.summary) + "</p></div></div>"
         );
       })
@@ -114,7 +120,7 @@ async function initHome() {
       .slice(0, 5)
       .map(function (p) {
         return (
-          '<li><a href="post.html?id=' + encodeURIComponent(p.id) + '">' + escapeHtml(p.title) + "</a>" +
+          '<li><a href="' + postHref(p) + '">' + escapeHtml(p.title) + "</a>" +
           '<time datetime="' + p.date + '">' + formatDate(p.date) + "</time></li>"
         );
       })
@@ -143,13 +149,13 @@ async function initHome() {
             : "";
         return (
           '<article class="post-card">' +
-          '<a class="card-cover" href="post.html?id=' + encodeURIComponent(p.id) + '">' +
+          '<a class="card-cover" href="' + postHref(p) + '">' +
           '<img src="' + coverFor(p) + '" alt="' + escapeHtml(p.title) + '" loading="lazy"></a>' +
           '<div class="card-meta"><time datetime="' + p.date + '">' + formatDate(p.date) + "</time>" +
           '<span class="dot">·</span><span>' + readingMinutes(p.content) + " 分钟</span>" +
           badge +
           "</div>" +
-          '<h3 class="card-title"><a href="post.html?id=' + encodeURIComponent(p.id) + '">' + escapeHtml(p.title) + "</a></h3>" +
+          '<h3 class="card-title"><a href="' + postHref(p) + '">' + escapeHtml(p.title) + "</a></h3>" +
           '<p class="card-summary">' + escapeHtml(p.summary) + "</p>" +
           '<div class="card-tags">' +
           p.tags.map(function (t) { return '<span class="chip">' + escapeHtml(t) + "</span>"; }).join("") +
@@ -196,14 +202,14 @@ function renderPostNav(posts, idx) {
 
   if (prev) {
     prevEl.innerHTML = '<span class="nav-label">上一篇</span>' + escapeHtml(prev.title);
-    prevEl.href = "post.html?id=" + encodeURIComponent(prev.id);
+    prevEl.href = postHref(prev);
   } else {
     prevEl.textContent = "没有了";
     prevEl.classList.add("disabled");
   }
   if (next) {
     nextEl.innerHTML = '<span class="nav-label">下一篇</span>' + escapeHtml(next.title);
-    nextEl.href = "post.html?id=" + encodeURIComponent(next.id);
+    nextEl.href = postHref(next);
   } else {
     nextEl.textContent = "没有了";
     nextEl.classList.add("disabled");
