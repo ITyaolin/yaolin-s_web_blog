@@ -168,7 +168,10 @@ summary: "一句话摘要。"
 
 - **壁纸**：Wallhaven（SFW・动漫分类），逐张链接见 `img/credits.txt`。
 - **看板娘**：「鲸鱼娘（精致版）」为基于鲸鱼娘形象的二次创作 / 精修变体，`pet.json` 标注 MIT。
-- **音乐**：三首曲目见 `js/music.js`，版权归各自原作者，此处仅作个人聆听；商用请自行确认授权。
+- **音乐**：三首曲目见 `js/music.js`，版权归各自原作者，原版链接：
+  - A Rusty Dream · DOUDOU：[YouTube](https://www.youtube.com/watch?v=XcKvndexQYE) · [网易云音乐](https://music.163.com/song?id=3422762511)
+  - Die on the Dancefloor · Chelle Mok：[YouTube](https://www.youtube.com/watch?v=wW76dsODvtA) · [网易云音乐](https://music.163.com/song?id=3393644057)
+  - LIFE · Neuro-sama：[YouTube](https://www.youtube.com/watch?v=MDc1mjrIsPM) · [网易云音乐](https://music.163.com/song?id=2657613721)
 - **Live2D / PIXI**：`l2d/haru/` 与 `js/vendor/` 是早期 Live2D 看板娘方案的素材与运行时
   （模型为 Live2D Inc. 官方免费样例，SDK 示例仅供学习 / 个人使用），当前页面不加载它们，留作备用。
 - **替换指南**：壁纸换 `img/`；看板娘换 `l2d/` 并同步改 `js/kanban.js`；音乐换 `music/` 并同步改
