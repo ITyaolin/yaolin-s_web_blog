@@ -3,8 +3,8 @@
  * ============================================================================
  * 把 posts/ 里的 Markdown 文章渲染成可以直接托管的静态网页：
  *
- *     posts/ 里的 .md/.txt  ──►  p-<id>.html   每篇文章一个完整页面
- *                           ──►  posts.json    文章清单（无目录列表时首页靠它列出文章）
+ *     posts/ 里的 .md/.txt  ──►  posts/p-<id>.html  每篇文章一个完整页面
+ *                           ──►  posts.json          文章清单（无目录列表时首页靠它列出文章）
  *
  * 设计原则：**与站点前端行为保持一致**。本程序的解析规则是 js/store.js 的
  * parseMdFile()、js/markdown.js 的 renderMarkdown()/plainText()/readingMinutes()、
@@ -21,14 +21,16 @@
  *   - 页面外壳（导航 / 看板娘 / 播放器 / 页脚）：运行时从 post.html 里截取，
  *           所以改 post.html 后重新渲染即可，不需要改本程序
  *
- * 注意：文章页放在站点根目录（与 index.html 同级），因为看板娘和播放器用的是
- * 相对路径（l2d/…、music/…），只有同层才能正常工作。
+ * 文章页放在 posts/ 里（和文章源文件同一个目录）。因为看板娘和播放器用的是
+ * l2d/…、music/… 这类相对站点根目录的路径，页面里加了一行 <base href="../">，
+ * 让所有相对路径都锚回站点根目录；也正因为 <base>，目录锚点必须写成
+ * posts/p-<id>.html#sec-N 这种完整路径，否则 #sec-N 会指向站点根。
  *
  * 用法：
  *     make            # 编译（tools/render）
  *     make render     # 渲染
  *     make check      # 只检查是否过期，过期则退出码 1
- *     make prune      # 删除已删文章的旧静态页
+ *     make prune      # 删除源文章已不存在的旧静态页
  * ============================================================================
  */
 
@@ -1215,18 +1217,22 @@ static char *format_date(const char *iso) {
   return xstrndup(buf, strlen(buf));
 }
 
-/* 生成 p-<id>.html 的相对 URL（已百分号编码，可直接放进 href） */
+/* 生成文章页的 URL（已百分号编码，可直接放进 href）。
+   页面放在 posts/ 里，所以：
+     - 清单 posts.json 里的 url 是相对站点根目录的：posts/p-<id>.html
+     - 页面自己用 <base href="../"> 把相对路径都锚回站点根目录，
+       于是同一个字符串在两边都成立 */
 static char *post_url(const char *id) {
   Buf b;
   buf_init(&b);
-  buf_puts(&b, "p-");
+  buf_puts(&b, "posts/p-");
   uri_encode(&b, id);
   buf_puts(&b, ".html");
   return b.s;
 }
 
 static void post_disk_path(Buf *out, const char *root, const char *id) {
-  buf_printf(out, "%s/p-%s.html", root, id);
+  buf_printf(out, "%s/posts/p-%s.html", root, id);
 }
 
 /* ========================= 组装一篇文章的页面 ========================= */
@@ -1239,8 +1245,14 @@ static void render_page(const Post *p, const Chrome *c, const char *cover, const
   HeadList heads = {0};
   render_markdown(p->content, &content_html, &heads);
 
+  /* 页面自己的 URL：目录锚点要用完整路径，因为 <base> 会让纯 #fragment 指向站点根 */
+  char *self_url = post_url(p->id);
+
   buf_puts(out, "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n");
   buf_puts(out, "  <meta charset=\"UTF-8\">\n");
+  /* 页面位于 posts/，用 <base> 把所有相对路径（css/js/img/l2d/music/上级页面）
+     统一锚回站点根目录，避免逐个改写成 ../ */
+  buf_puts(out, "  <base href=\"../\">\n");
   buf_puts(out, "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n");
   buf_puts(out, "  <title>");
   buf_escape_html(out, p->title);
@@ -1290,7 +1302,7 @@ static void render_page(const Post *p, const Chrome *c, const char *cover, const
       Buf label;
       buf_init(&label);
       html_to_text(heads.v[i].html, &label);
-      buf_printf(&toc, "<li class=\"toc-h%d\"><a href=\"#sec-%lu\">", heads.v[i].level,
+      buf_printf(&toc, "<li class=\"toc-h%d\"><a href=\"%s#sec-%lu\">", heads.v[i].level, self_url,
                  (unsigned long)i);
       buf_puts(&toc, label.s);
       buf_puts(&toc, "</a></li>");
@@ -1338,6 +1350,7 @@ static void render_page(const Post *p, const Chrome *c, const char *cover, const
   buf_puts(out, "  <script src=\"js/music.js\" defer></script>\n");
   buf_puts(out, "  <script src=\"js/effects.js\" defer></script>\n");
   buf_puts(out, "</body>\n</html>\n");
+  free(self_url);
 
   buf_free(&content_html);
   buf_free(&toc);
@@ -1548,50 +1561,70 @@ int main(int argc, char **argv) {
     }
   }
 
-  /* 清理旧静态页 */
-  DIR *rd = opendir(root);
-  if (rd) {
-    struct dirent *e2;
-    while ((e2 = readdir(rd)) != NULL) {
-      const char *nm = e2->d_name;
-      size_t ln = strlen(nm);
-      if (ln < 8 || strncmp(nm, "p-", 2) != 0) continue;
-      if (strcmp(nm + ln - 5, ".html") != 0) continue;
-      /* 只认我们自己生成的（文件里有标记） */
-      Buf full;
-      buf_init(&full);
-      buf_printf(&full, "%s/%s", root, nm);
-      char *data = read_file(full.s, NULL);
-      int ours = data && strstr(data, GENERATED_MARK) != NULL;
-      int known = 0;
-      for (size_t k = 0; k < expected.n && !known; k++) {
-        Buf want;
-        buf_init(&want);
-        buf_printf(&want, "p-%s.html", expected.v[k]);
-        if (!strcmp(want.s, nm)) known = 1;
-        buf_free(&want);
+  /* 清理静态页：
+       - posts/ 里源文章已不存在的旧页（--prune 才删）
+       - 站点根目录里旧位置的残留（p-<id>.html 现在统一生成到 posts/，直接搬干净） */
+  {
+    static const struct { int legacy; } PLACES[2] = {{1}, {0}}; /* 0=根目录(旧) 1=posts/(新) */
+    for (size_t pi = 0; pi < 2; pi++) {
+      int legacy = PLACES[pi].legacy;
+      Buf dirp;
+      buf_init(&dirp);
+      buf_printf(&dirp, "%s%s", root, legacy ? "" : "/posts");
+      DIR *rd = opendir(dirp.s);
+      if (!rd) {
+        buf_free(&dirp);
+        continue;
       }
-      free(data);
-      if (ours && !known) {
-        if (check) {
-          printf("多余  %s\n", full.s);
-          failures++;
-        } else if (prune) {
-          if (remove(full.s) == 0) {
-            printf("删除 %s（源文章已不存在）\n", full.s);
-            changed++;
-          } else {
-            fprintf(stderr, "%s: 无法删除 %s\n", g_prog, full.s);
-          }
-        } else {
-          printf("提示: %s 已无对应文章，可运行 make prune 删除\n", full.s);
+      struct dirent *e2;
+      while ((e2 = readdir(rd)) != NULL) {
+        const char *nm = e2->d_name;
+        size_t ln = strlen(nm);
+        if (ln < 8 || strncmp(nm, "p-", 2) != 0) continue;
+        if (strcmp(nm + ln - 5, ".html") != 0) continue;
+
+        Buf full;
+        buf_init(&full);
+        buf_printf(&full, "%s/%s", dirp.s, nm);
+        char *data = read_file(full.s, NULL);
+        int ours = data && strstr(data, GENERATED_MARK) != NULL; /* 只认自己生成的 */
+        free(data);
+        if (!ours) {
+          buf_free(&full);
+          continue;
         }
-      } else if (ours) {
-        /* 已知的静态页：--check 时已在上面比过内容 */
+
+        int known = 0;
+        if (!legacy) {
+          for (size_t k = 0; k < expected.n && !known; k++) {
+            Buf want;
+            buf_init(&want);
+            buf_printf(&want, "p-%s.html", expected.v[k]);
+            if (!strcmp(want.s, nm)) known = 1;
+            buf_free(&want);
+          }
+        }
+        if (!known) {
+          const char *why = legacy ? "已改到 posts/ 目录" : "源文章已不存在";
+          if (check) {
+            printf("%s  %s（%s）\n", legacy ? "旧位置" : "多余", full.s, why);
+            failures++;
+          } else if (prune || legacy) {
+            if (remove(full.s) == 0) {
+              printf("删除 %s（%s）\n", full.s, why);
+              changed++;
+            } else {
+              fprintf(stderr, "%s: 无法删除 %s\n", g_prog, full.s);
+            }
+          } else {
+            printf("提示: %s %s，可运行 make prune 删除\n", full.s, why);
+          }
+        }
+        buf_free(&full);
       }
-      buf_free(&full);
+      closedir(rd);
+      buf_free(&dirp);
     }
-    closedir(rd);
   }
 
   if (check) {

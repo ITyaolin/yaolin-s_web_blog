@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <base href="../">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>把一首歌编译成终端动画：world.execute (me); ASCII MV · yaolin 博客</title>
   <meta name="description" content="一个可执行程序，运行就在终端里放 Mili《world.execute (me);》的 ASCII 动画 MV：49 个场景、13 种转场、逐词卡拉OK，每一帧都是实时算出来的。">
@@ -29,7 +30,7 @@
   </header>
 
   <main class="container post-layout">
-    <article id="post-article" class="post-article"><div class="post-cover"><img src="img/biqi.jpg" alt="把一首歌编译成终端动画：world.execute (me); ASCII MV"></div><header class="post-head"><h1>把一首歌编译成终端动画：world.execute (me); ASCII MV</h1><div class="post-meta"><time datetime="2026-09-28">2026年9月28日</time><span class="dot">·</span><span>4 分钟读完</span></div><div class="card-tags"><span class="chip">C</span><span class="chip">ASCII</span><span class="chip">音乐可视化</span></div></header><div class="post-content"><h1>把一首歌编译成终端动画</h1><p>我很喜欢那种「把东西压成一个文件」的做法。这个项目就是：一首歌，变成一个可执行程序。</p><p><code>make &amp;&amp; ./start</code>，终端里就开始播 Mili《world.execute (me);》的 ASCII 动画 MV。没有浏览器，没有播放器，没有视频文件——每一帧都是程序根据播放时间当场算出来的，mp3 只是顺带播放。</p><p><img src="https://raw.githubusercontent.com/ITyaolin/world-execute-me-mv/main/preview/opening.gif" alt="开场 20 秒" loading="lazy"></p><h2 id="sec-0">跑起来</h2><pre><code class="lang-sh">git clone https://github.com/ITyaolin/world-execute-me-mv.git
+    <article id="post-article" class="post-article"><div class="post-cover"><img src="img/【哲风壁纸】二次元-初音未来.png" alt="把一首歌编译成终端动画：world.execute (me); ASCII MV"></div><header class="post-head"><h1>把一首歌编译成终端动画：world.execute (me); ASCII MV</h1><div class="post-meta"><time datetime="2026-09-28">2026年9月28日</time><span class="dot">·</span><span>4 分钟读完</span></div><div class="card-tags"><span class="chip">C</span><span class="chip">ASCII</span><span class="chip">音乐可视化</span></div></header><div class="post-content"><h1>把一首歌编译成终端动画</h1><p>我很喜欢那种「把东西压成一个文件」的做法。这个项目就是：一首歌，变成一个可执行程序。</p><p><code>make &amp;&amp; ./start</code>，终端里就开始播 Mili《world.execute (me);》的 ASCII 动画 MV。没有浏览器，没有播放器，没有视频文件——每一帧都是程序根据播放时间当场算出来的，mp3 只是顺带播放。</p><p><img src="https://raw.githubusercontent.com/ITyaolin/world-execute-me-mv/main/preview/opening.gif" alt="开场 20 秒" loading="lazy"></p><h2 id="sec-0">跑起来</h2><pre><code class="lang-sh">git clone https://github.com/ITyaolin/world-execute-me-mv.git
 cd world-execute-me-mv
 make &amp;&amp; ./start</code></pre><p>仓库不附带音频，也不附带歌词源文件（时间轴已经烘焙进头文件），所以 clone 下来直接 <code>make</code> 就能跑。想听声音，就把一首同名 mp3 放到 <code>start</code> 旁边——程序会先找可执行文件所在的目录，整个文件夹拷走就能用。</p><h2 id="sec-1">画面长什么样</h2><p>程序自带离线导出，可以把任意一帧打印成纯文本。这是第 68 秒那一帧（<code>./start --dump 68000 --size 60x18 --color mono</code>）：</p><pre><code class="lang-text"> world.execute (me);  beat  . . . @                    1:08 
                                                             
@@ -66,11 +67,11 @@ make &amp;&amp; ./start</code></pre><p>仓库不附带音频，也不附带歌�
 ./start --dump 68000    # 把第 68 秒那一帧按纯文本打印出来
 ./start --selftest      # 自检：时间轴 + 每一个特效</code></pre><p>自检输出：</p><pre><code class="lang-text">scenes: 49, lyric lines: 129, words: 422
 selftest: OK (0 failures)</code></pre><h2 id="sec-4">它由什么组成</h2><ul><li><strong>49 个场景</strong>，锚定到歌词时间轴</li><li><strong>13 种转场</strong>：溶解、四向擦除、径向开合、故障、闪白、闪黑、滑动、百叶窗、燃烧</li><li><strong>逐词卡拉OK</strong>：129 行歌词、422 个词，42 个关键词会放大成巨型字体</li><li><strong>18 个手工 ASCII 精灵</strong>：茄子、番茄、猫、神、心、锁链、警告……</li><li>终端自适应、多色域降级、胶片颗粒与 HUD</li></ul><h2 id="sec-5">几个我觉得聪明的做法</h2><p><strong>一切是时间的纯函数。</strong> 特效不保存状态，只接收「现在是第几毫秒」。这样既不会累积误差，跳转和导出也天然一致。</p><p><strong>转场不是硬切。</strong> 进入转场窗口后，前后两个场景都会渲染，再按权重图混合，并在转场中点压一下亮度——看起来像真的在溶解，而不是两张图叠在一起。</p><p><strong>逐单元 diff 输出。</strong> 只把发生变化的终端单元格写出去，30fps 也不至于刷屏。</p><p><strong>大字要修正宽高比。</strong> 终端单元格是 8x16 像素（宽高比 1:2），所以所有圆都按 <code>ry = rx * 0.5</code> 修正，点阵字体则采样到正方形单元格块里，保证字母不被拉长。</p><p><strong>优雅降级。</strong> 颜色按 <code>COLORTERM</code> / <code>TERM</code> 自动在 truecolor / 256 / 16 / 单色之间降级；退出时恢复光标、备用屏幕和颜色，原 shell 内容还在。</p><h2 id="sec-6">已知取舍</h2><p>音频同步是「同时启动」级别的：程序用单调时钟推进画面，先把播放器拉起来（默认等 180 ms）再开始计时。想更准就用 <code>--offset</code> 微调。</p><ul><li><a href="https://github.com/ITyaolin/world-execute-me-mv" target="_blank" rel="noopener">源码</a></li><li><a href="https://github.com/ITyaolin" target="_blank" rel="noopener">作者</a></li></ul></div></article>
-    <aside id="post-toc" class="post-toc"><h4 class="toc-title">目录</h4><ul class="toc-list"><li class="toc-h2"><a href="#sec-0">跑起来</a></li><li class="toc-h2"><a href="#sec-1">画面长什么样</a></li><li class="toc-h2"><a href="#sec-2">49 个场景</a></li><li class="toc-h2"><a href="#sec-3">没有终端也能用</a></li><li class="toc-h2"><a href="#sec-4">它由什么组成</a></li><li class="toc-h2"><a href="#sec-5">几个我觉得聪明的做法</a></li><li class="toc-h2"><a href="#sec-6">已知取舍</a></li></ul></aside>
+    <aside id="post-toc" class="post-toc"><h4 class="toc-title">目录</h4><ul class="toc-list"><li class="toc-h2"><a href="posts/p-%E7%BB%88%E7%AB%AFASCII%E9%9F%B3%E4%B9%90%E5%8A%A8%E7%94%BB.html#sec-0">跑起来</a></li><li class="toc-h2"><a href="posts/p-%E7%BB%88%E7%AB%AFASCII%E9%9F%B3%E4%B9%90%E5%8A%A8%E7%94%BB.html#sec-1">画面长什么样</a></li><li class="toc-h2"><a href="posts/p-%E7%BB%88%E7%AB%AFASCII%E9%9F%B3%E4%B9%90%E5%8A%A8%E7%94%BB.html#sec-2">49 个场景</a></li><li class="toc-h2"><a href="posts/p-%E7%BB%88%E7%AB%AFASCII%E9%9F%B3%E4%B9%90%E5%8A%A8%E7%94%BB.html#sec-3">没有终端也能用</a></li><li class="toc-h2"><a href="posts/p-%E7%BB%88%E7%AB%AFASCII%E9%9F%B3%E4%B9%90%E5%8A%A8%E7%94%BB.html#sec-4">它由什么组成</a></li><li class="toc-h2"><a href="posts/p-%E7%BB%88%E7%AB%AFASCII%E9%9F%B3%E4%B9%90%E5%8A%A8%E7%94%BB.html#sec-5">几个我觉得聪明的做法</a></li><li class="toc-h2"><a href="posts/p-%E7%BB%88%E7%AB%AFASCII%E9%9F%B3%E4%B9%90%E5%8A%A8%E7%94%BB.html#sec-6">已知取舍</a></li></ul></aside>
   </main>
 
   <nav class="container post-nav">
-    <a id="prev-post" class="post-nav-link prev" href="p-2026.09.18%E6%97%A5%E5%BF%97.html"><span class="nav-label">上一篇</span>2026-09-18吐槽</a>
+    <a id="prev-post" class="post-nav-link prev" href="posts/p-2026.09.18%E6%97%A5%E5%BF%97.html"><span class="nav-label">上一篇</span>2026-09-18吐槽</a>
     <a href="index.html" class="back-home">← 返回首页</a>
     <a id="next-post" class="post-nav-link next disabled">没有了</a>
   </nav>
@@ -88,7 +89,6 @@ selftest: OK (0 failures)</code></pre><h2 id="sec-4">它由什么组成</h2><ul>
 
   <!-- 背景音乐 -->
   <div id="music-dock" class="music-dock" title="背景音乐（点击可暂停）">
-    <span class="music-icon" aria-hidden="true">🎵</span>
     <span id="music-eq" class="music-eq" aria-hidden="true"><i></i><i></i><i></i></span>
     <button type="button" id="music-play" class="music-play" aria-label="播放或暂停">
       <svg class="m-ico-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
@@ -97,7 +97,6 @@ selftest: OK (0 failures)</code></pre><h2 id="sec-4">它由什么组成</h2><ul>
     <span id="music-title" class="music-title">A Rusty Dream · DOUDOU</span>
     <button type="button" id="music-next" class="music-next" aria-label="下一首"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></svg></button>
     <button type="button" id="music-lyric-btn" class="music-lyric-btn" aria-label="歌词" title="歌词"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></button>
-    <span id="music-hint" class="music-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> 点击播放</span>
   </div>
 
   <!-- 播放进度条 -->
