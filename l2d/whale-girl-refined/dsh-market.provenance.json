@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "source": "https://dsh-market.com",
+  "kind": "pet",
+  "id": "whale-girl-refined",
+  "installedAt": "2026-08-28T14:15:28.317Z",
+  "files": {
+    "pet.json": "f691dd3d96aa924afa6c61db4d861311bc9eedf2fea34fe60e98f8c33c0f2a8d",
+    "previews/idle.gif": "ff72a16a90742bf193601a697c31a15ff21acca238515f5a8d883945e0a162e5",
+    "spritesheet.webp": "db33b20086a14867d4d4595d4f9bfd76b2479abbb5d712bbb51a2540483c1130"
+  }
+}

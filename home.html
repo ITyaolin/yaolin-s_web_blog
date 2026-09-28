@@ -28,15 +28,15 @@
   </header>
 
   <main class="container">
-    <section class="live-hero">
+    <section class="about-hero" style="background-image: linear-gradient(to bottom, rgba(23, 18, 38, 0.20), rgba(23, 18, 38, 0.62)), url('img/bi.jpg');">
       <h1>家</h1>
-      <p class="hero-sub">一个用代码一点点搭起来的小窝，还在慢慢长大～</p>
+      <p>一个用代码一点点搭起来的小窝，还在慢慢长大～</p>
       <p class="hitokoto" id="hitokoto">「…」</p>
     </section>
 
-    <section class="live-grid">
-      <div class="live-card">
-        <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 站点存活时间</h2>
+    <div class="about">
+      <section>
+        <h2>站点存活时间</h2>
         <div class="counter-row">
           <div class="counter-seg"><b id="up-y">0</b><span>年</span></div>
           <div class="counter-seg"><b id="up-d">0</b><span>天</span></div>
@@ -44,25 +44,43 @@
           <div class="counter-seg"><b id="up-m">00</b><span>分</span></div>
           <div class="counter-seg"><b id="up-s">00</b><span>秒</span></div>
         </div>
-        <p class="live-note">自 <em>2025-07-08</em> 建站起，这个小窝已经在互联网上活了这么久啦～</p>
-      </div>
+        <p class="live-note" style="margin-top:12px;text-align:center;">自 <em>2025-07-08</em> 建站起，这个小窝已经在互联网上活了这么久啦～</p>
+      </section>
 
-      <div class="live-card">
-        <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg> 春节倒计时</h2>
+      <section>
+        <h2>春节倒计时</h2>
         <div class="counter-row">
           <div class="counter-seg"><b id="sp-d">0</b><span>天</span></div>
           <div class="counter-seg"><b id="sp-h">00</b><span>时</span></div>
           <div class="counter-seg"><b id="sp-m">00</b><span>分</span></div>
           <div class="counter-seg"><b id="sp-s">00</b><span>秒</span></div>
         </div>
-        <p class="live-note">距离下一个春节还有……时间过得真快，记得早点回家过年呀！</p>
-      </div>
-    </section>
+        <p class="live-note" style="margin-top:12px;text-align:center;">距离下一个春节还有……时间过得真快，记得早点回家过年呀！</p>
+      </section>
+
+      <section>
+        <h2>今日摸鱼指数</h2>
+        <div class="fortune-display">
+          <div class="fortune-meter">
+            <div class="meter-fill" id="meter-fill" style="width: 0%;"></div>
+          </div>
+          <div class="fortune-text" id="fortune-text">戳一下测测今天摸鱼指数～</div>
+        </div>
+        <button class="fortune-btn" id="fortune-btn" type="button">戳一戳</button>
+      </section>
+
+      <section>
+        <h2>戳戳乐</h2>
+        <div class="heart-zone" id="heart-zone">
+          <span class="heart-hint">点这里出爱心</span>
+        </div>
+      </section>
+    </div>
   </main>
 
   <footer class="site-footer">
     <div class="container">
-      <p>用 <svg class="foot-heart" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> 与代码一点点搭起来的小窝 · 文章来自本机 posts/ · Live2D + Lofi · <a class="footer-link" href="https://github.com/ITyaolin" target="_blank" rel="noopener">GitHub @ITyaolin</a></p>
+      <p>用 <svg class="foot-heart" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> 与代码一点点搭起来的小窝 · 文章来自本机 posts/ · 鲸鱼娘 + Lofi · <a class="footer-link" href="https://github.com/ITyaolin" target="_blank" rel="noopener">GitHub @ITyaolin</a></p>
     </div>
   </footer>
 
@@ -89,19 +107,17 @@
     <div class="music-lyrics-body" id="lyric-body"></div>
   </div>
 
-  <!-- Live2D 看板娘（右侧） -->
-  <div id="kanban-right" class="kanban kanban-right" title="看板娘（Live2D）">
+  <!-- 看板娘（右侧） -->
+  <div id="kanban-right" class="kanban kanban-right" title="鲸鱼娘">
     <div class="kanban-bubble" id="kanban-right-bubble" hidden></div>
   </div>
 
   <script src="js/store.js"></script>
   <script src="js/config.js"></script>
-  <script src="js/vendor/pixi.min.js" defer></script>
-  <script src="js/vendor/live2dcubismcore.min.js" defer></script>
-  <script src="js/vendor/cubism4.min.js" defer></script>
   <script src="js/kanban.js" defer></script>
   <script src="js/music.js" defer></script>
   <script src="js/effects.js" defer></script>
   <script src="js/siteclock.js" defer></script>
+  <script src="js/homefun.js" defer></script>
 </body>
 </html>

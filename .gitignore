@@ -6,3 +6,14 @@ hexo/
 Thumbs.db
 *.swp
 *~
+
+# 用户提供的输入压缩包与合并临时目录
+web_dsh.tar.gz
+.merge_scratch/
+
+# 合并时排除的备份 / 临时文件（压缩包里带的杂物）
+index.html.back
+test.tar.gz
+.tmp_analysis/
+posts/*.back
+posts/*.bcak
